@@ -1,6 +1,8 @@
 ﻿using AppPrimiani.Api.Common.Api;
 using AppPrimiani.Api.Endpoints.Categories;
+using AppPrimiani.Api.Endpoints.Identity;
 using AppPrimiani.Api.Endpoints.Transactions;
+using AppPrimiani.Api.Models;
 
 namespace AppPrimiani.Api.Endpoints
 {
@@ -13,9 +15,23 @@ namespace AppPrimiani.Api.Endpoints
             var endpoints = app.MapGroup("");
 
             //Aqui é onde você vai adicionar os endpoints
+
+            endpoints.MapGroup("/")
+                 .WithTags("Health Check")
+                 .MapGet("/", () => new { message = "OK" });
+
+            endpoints.MapGroup("v1/identity")
+                .WithTags("Identity")
+                .MapIdentityApi<User>();
+
+            endpoints.MapGroup("v1/identity")
+                .WithTags("Identity")
+                .MapEndpoint<LogoutEndpoint>()
+                .MapEndpoint<GetRolesEndpoint>();
+
             endpoints.MapGroup("v1/categories")
                 .WithTags("Categories")
-                .RequireAuthorization ()
+                .RequireAuthorization()
                 .MapEndpoint<CreateCategoryEndpoint>()
                 .MapEndpoint<UpdateCategoryEndpoint>()
                 .MapEndpoint<DeleteCategoryEndpoint>()
@@ -24,7 +40,7 @@ namespace AppPrimiani.Api.Endpoints
 
             endpoints.MapGroup("v1/transactions")
                 .WithTags("Transactions")
-                .RequireAuthorization ()
+                .RequireAuthorization()
                 .MapEndpoint<CreateTransactionEndpoint>()
                 .MapEndpoint<UpdateTransactionEndpoint>()
                 .MapEndpoint<DeleteTransactionEndpoint>()
