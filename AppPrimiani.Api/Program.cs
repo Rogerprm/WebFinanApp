@@ -5,6 +5,7 @@ using AppPrimiani.Api.Models;
 using AppPrimiani.Core.Handlers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +62,36 @@ app.MapEndpoints();
 app.MapGroup("v1/identity")
     .WithTags("Identity")
     .MapIdentityApi<User>();
+
+app.MapGroup("v1/identity")
+    .WithTags("Identity")
+    .MapPost("/logout", async (SignInManager<User> signInManager) => 
+    {
+            await signInManager.SignOutAsync();
+        return Results.Ok();
+    })
+    .RequireAuthorization();
+
+app.MapGroup("v1/identity")
+    .WithTags("Identity")
+    .MapGet("/roles", (ClaimsPrincipal user) =>
+    {
+        if (user.Identity?.IsAuthenticated != true)
+            return Results.Unauthorized(); 
+        
+        var identity = (ClaimsIdentity)user.Identity;
+        var roles = identity.FindAll(identity.RoleClaimType)
+        .Select(x => new { 
+            x.Issuer,
+            x.OriginalIssuer,
+            x.Type,
+            x.Value,
+            x.ValueType
+        });
+
+        return TypedResults.Json(roles);
+    })
+    .RequireAuthorization();
 
 app.Run();
 

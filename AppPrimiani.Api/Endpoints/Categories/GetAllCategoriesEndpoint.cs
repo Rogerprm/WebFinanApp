@@ -5,6 +5,7 @@ using AppPrimiani.Core.Models;
 using AppPrimiani.Core.Requests.Categories;
 using AppPrimiani.Core.Responses;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AppPrimiani.Api.Endpoints.Categories
 {
@@ -19,14 +20,16 @@ namespace AppPrimiani.Api.Endpoints.Categories
                    .Produces<PagedResponse<List<Category?>>>();
 
 
-        private static async Task<IResult> HandleAsync(ICategoryHandler handler,
+        private static async Task<IResult> HandleAsync(
+            ClaimsPrincipal user,
+            ICategoryHandler handler,
             [FromQuery] int pageNumber = Configuration.DefaultPageNumber,
             [FromQuery] int pageSize = Configuration.DefaultPageSize
             )
         {
             var request = new GetAllCategoriesRequest
             {
-                UserId = "Teste@teste",
+                UserId = user.Identity?.Name ?? string.Empty,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
             };

@@ -3,6 +3,7 @@ using AppPrimiani.Core.Handlers;
 using AppPrimiani.Core.Models;
 using AppPrimiani.Core.Requests.Categories;
 using AppPrimiani.Core.Responses;
+using System.Security.Claims;
 
 namespace AppPrimiani.Api.Endpoints.Categories
 {
@@ -17,10 +18,12 @@ namespace AppPrimiani.Api.Endpoints.Categories
             .Produces<Response<Category?>>();
 
 
-        private static async Task<IResult> HandleAsync(ICategoryHandler handler,
+        private static async Task<IResult> HandleAsync(
+            ClaimsPrincipal user,
+            ICategoryHandler handler,
             UpdateCategoryRequest request, long id)
         {
-            request.UserId = "Teste@teste";
+            request.UserId = user.Identity?.Name ?? string.Empty;
             request.Id = id;
             var result = await handler.UpdateCategoryAsync(request);
             return result.IsSuccess
