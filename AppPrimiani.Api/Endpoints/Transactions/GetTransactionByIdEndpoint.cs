@@ -4,6 +4,7 @@ using AppPrimiani.Core.Models;
 using AppPrimiani.Core.Requests.Categories;
 using AppPrimiani.Core.Requests.Transactions;
 using AppPrimiani.Core.Responses;
+using System.Security.Claims;
 
 namespace AppPrimiani.Api.Endpoints.Transactions
 {
@@ -18,12 +19,14 @@ namespace AppPrimiani.Api.Endpoints.Transactions
                     .Produces<Response<Transaction?>>();
 
 
-        private static async Task<IResult> HandleAsync(ITransactionHandler handler,
+        private static async Task<IResult> HandleAsync(
+            ClaimsPrincipal user,
+            ITransactionHandler handler,
             long id)
         {
             var request = new GetTransactionByIdRequest
             {
-                UserId = "Teste@teste",
+                UserId = user.Identity?.Name ?? string.Empty,
                 Id = id
             };
 

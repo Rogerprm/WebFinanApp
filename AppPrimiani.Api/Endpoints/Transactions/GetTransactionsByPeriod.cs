@@ -5,6 +5,7 @@ using AppPrimiani.Core.Models;
 using AppPrimiani.Core.Requests.Transactions;
 using AppPrimiani.Core.Responses;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 
 namespace AppPrimiani.Api.Endpoints.Transactions
@@ -20,7 +21,9 @@ namespace AppPrimiani.Api.Endpoints.Transactions
                    .Produces<PagedResponse<List<Transaction?>>>();
 
 
-        private static async Task<IResult> HandleAsync(ITransactionHandler handler,
+        private static async Task<IResult> HandleAsync(
+            ClaimsPrincipal user,
+            ITransactionHandler handler,
             [FromQuery] DateTime? startDate = null,
             [FromQuery] DateTime? endDate = null,
             [FromQuery] int pageNumber = Configuration.DefaultPageNumber,
@@ -28,8 +31,8 @@ namespace AppPrimiani.Api.Endpoints.Transactions
             )
         {
             var request = new GetTransactionsByPeriodRequest
-            {
-                UserId = "Teste@teste",
+            {                
+                UserId = user.Identity?.Name ?? string.Empty,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
                 StartDate = null,

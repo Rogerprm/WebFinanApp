@@ -3,6 +3,7 @@ using AppPrimiani.Core.Handlers;
 using AppPrimiani.Core.Models;
 using AppPrimiani.Core.Requests.Categories;
 using AppPrimiani.Core.Responses;
+using System.Security.Claims;
 
 namespace AppPrimiani.Api.Endpoints.Transactions
 {
@@ -16,13 +17,20 @@ namespace AppPrimiani.Api.Endpoints.Transactions
                     .WithOrder(3)
                     .Produces<Response<Transaction?>>();
 
+        /*
+         *  "email": "adm@adm",
+            "password": "Abc!123*" 
+         */
 
-        private static async Task<IResult> HandleAsync(ICategoryHandler handler,
+
+        private static async Task<IResult> HandleAsync(
+            ClaimsPrincipal user,
+            ICategoryHandler handler,
             long id)
         {
             var request = new DeleteCategoryRequest
             {
-                UserId = "Teste@teste",
+                UserId = user.Identity?.Name ?? string.Empty,
                 Id = id
             };
 
